@@ -14,8 +14,8 @@ def get_input_test():
     return masses
 
 
-def get_input():
-    fh = open(DIR + "/input-1", "r")
+def get_input(name):
+    fh = open(DIR + "/" + name, "r")
     masses = list(map(lambda x: int(x.strip()), fh.readlines()))
     return masses
 
@@ -30,7 +30,7 @@ def solve1():
     #masses = get_input_test()
 
     # input
-    masses = get_input()
+    masses = get_input("input-1")
 
     print("Input masses:")
     print(masses)
@@ -47,8 +47,41 @@ def solve1():
     return total
 
 
+def mass2fuel_realist(mass):
+	
+	l_fuel = []
+	
+	fuel = mass2fuel(mass)
+	while fuel > 0:
+		l_fuel.append(fuel)
+		mass = fuel
+		fuel = mass2fuel(mass)
+	
+	total_fuel = sum(l_fuel)
+	
+	return total_fuel
+
+
 def solve2():
-    pass
+    # test input
+    #masses = get_input_test()
+
+    # input
+    masses = get_input("input-1")
+
+    print("Input masses:")
+    print(masses)
+
+    fuel = list(map(mass2fuel_realist, masses))
+
+    print("Fuel requirements:")
+    print(fuel)
+
+    total = sum(fuel)
+
+    print("Total fuel requirement:")
+    print(total)
+    return total
 
 
 if __name__ == "__main__":

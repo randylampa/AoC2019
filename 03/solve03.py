@@ -25,9 +25,9 @@ def get_wires(is_hot = False):
     if is_hot:
         wires = get_input("input03")
     else:
-        #wires = get_input("input03-test0") # 6
-        #wires = get_input("input03-test1") # 159
-        wires = get_input("input03-test2") # 135
+        wires = get_input("input03-test0") # dist=6, steps=30
+        #wires = get_input("input03-test1") # dist=159, steps=610
+        #wires = get_input("input03-test2") # dist=135, steps=410
 
     return wires
 
@@ -91,7 +91,7 @@ def get_wires_points(wires, center_point = (1, 1)):
 
     for wire in wires:
         # start at centerpoint
-        print("WIRE")
+        #print("WIRE")
         startpoint = center_point;
         wire_points = []
 
@@ -141,22 +141,56 @@ def solve1():
     print("distances", distances)
 
     distance = min(distances)
-    #print("distance", distance)
-
 
     return distance
 
 
 def solve2():
-    pass
+
+    wires = get_wires(True)
+
+    #print("wires", wires)
+
+
+    center_point = (1,1)
+    wires_points = get_wires_points(wires, center_point)
+
+    #print("wires_points", wires_points)
+
+
+    crosses = get_wires_crosses(wires_points)
+
+    #print("crosses", crosses)
+
+
+    distances = []
+
+    for cross in crosses:
+        (wp1, wp2) = wires_points
+        l1 = None
+        l2 = None
+        try:
+            l1 = wp1.index(cross)
+            l2 = wp2.index(cross)
+        except ValueError:
+            print("Cross not found!")
+
+        if l1 is not None and l2 is not None:
+            distances.append(l1 + 1 + l2 + 1)
+
+    print("distances", distances)
+
+    distance = min(distances)
+
+    return distance
 
 
 if __name__ == "__main__":
 
     print("="*40)
-    print("Solve 1 status:", solve1())
+    #print("Solve 1 status:", solve1())
     print("="*40)
 
     print("="*40)
-    #print("Solve 2 status:", solve2())
+    print("Solve 2 status:", solve2())
     print("="*40)

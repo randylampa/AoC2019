@@ -21,6 +21,17 @@ def get_input(name):
     return data
 
 
+def get_wires(is_hot = False):
+    if is_hot:
+        wires = get_input("input03")
+    else:
+        #wires = get_input("input03-test0") # 6
+        #wires = get_input("input03-test1") # 159
+        wires = get_input("input03-test2") # 135
+
+    return wires
+
+
 def drr_to_point(point, drr):
     drc = drr[0]
     step = drr[1]
@@ -75,27 +86,13 @@ def dump_grid(wires_points, crosses = [], centerpoint = (0, 0)):
     pass
 
 
-def solve1():
-
-    if True:
-        wires = get_input("input03")
-    else:
-        #wires = get_input("input03-test0") # 6
-        #wires = get_input("input03-test1") # 159
-        wires = get_input("input03-test2") # 135
-
-    #print("wires", wires)
-
-
-    centerpoint = (1,1)
+def get_wires_points(wires, center_point = (1, 1)):
     wires_points = []
-    crosses = []
-
 
     for wire in wires:
         # start at centerpoint
         print("WIRE")
-        startpoint = centerpoint;
+        startpoint = center_point;
         wire_points = []
 
         for drr in wire:
@@ -107,22 +104,45 @@ def solve1():
 
         wires_points.append(wire_points)
 
+    return wires_points
+
+
+def get_wires_crosses(wires_points):
+    (wp1, wp2) = wires_points
+    crosses = [*set(wp1).intersection(wp2)]
+    return crosses
+
+
+def points_to_distances(points, ref_point = (0, 0)):
+    distances = [*map(lambda p: distance_manhattan(ref_point, p), points)]
+    return distances
+
+
+def solve1():
+
+    wires = get_wires(True)
+
+    #print("wires", wires)
+
+
+    center_point = (1,1)
+    wires_points = get_wires_points(wires, center_point)
 
     #print("wires_points", wires_points)
 
 
-    (wp1, wp2) = wires_points
-
-    crosses = [*set(wp1).intersection(wp2)]
+    crosses = get_wires_crosses(wires_points)
 
     #print("crosses", crosses)
 
-    print("size", get_grid_size_limit(wires_points))
 
-    distances = [*map(lambda p: distance_manhattan(centerpoint, p), crosses)]
+    distances = points_to_distances(crosses, center_point)
+
     print("distances", distances)
 
     distance = min(distances)
+    #print("distance", distance)
+
 
     return distance
 

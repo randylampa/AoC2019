@@ -40,14 +40,7 @@ def drr_to_point(point, drr):
     return newpoint
 
 
-def put_point(grid, point, crosses):
-    if point in grid:
-        crosses.append(point)
-    else:
-        grid.append(point)
-
-
-def draw_line(grid, start, end, crosses = []):
+def draw_line(wire_points, start, end):
     dx = end[0] - start[0]
     dy = end[1] - start[1]
     #print("dx={}, dy={}".format(dx,dy))
@@ -55,15 +48,11 @@ def draw_line(grid, start, end, crosses = []):
     if dx != 0:
         d = -1 if dx < 0 else 1
         for x in range(start[0] + d, end[0] + d, d):
-            #print(x)
-            point = (x, start[1])
-            put_point(grid, point, crosses)
+            wire_points.append((x, start[1]))
     elif dy != 0:
         d = -1 if dy < 0 else 1
         for y in range(start[1] + d, end[1] + d, d):
-            #print(y)
-            point = (start[0], y)
-            put_point(grid, point, crosses)
+            wire_points.append((start[0], y))
 
 
 def distance_manhattan(point1, point2):
@@ -71,60 +60,64 @@ def distance_manhattan(point1, point2):
     return distance
 
 
-def dump_grid(grid, dim_x, dim_y, crosses = [], centerpoint = (0, 0)):
-    for y in range(dim_y):
-        line = ""
-        for x in range(dim_x):
-            p = (x, y)
-            if p == centerpoint:
-                ch = "O"
-            elif p in crosses:
-                ch = "X"
-            elif p in grid:
-                ch = "+"
-            else:
-                ch = "."
-            line += ch
-        print(line)
+def get_grid_size_limit(wires_points):
+    xs = []
+    ys = []
+    for wire_points in wires_points:
+        for point in wire_points:
+            xs.append(point[0])
+            ys.append(point[1])
+    size = ((min(xs), min(ys)), (max(xs), max(ys)))
+    return size
+
+
+def dump_grid(wires_points, crosses = [], centerpoint = (0, 0)):
+    pass
 
 
 def solve1():
 
-    if False:
+    if True:
         wires = get_input("input03")
     else:
-        wires = get_input("input03-test0") # 6
+        #wires = get_input("input03-test0") # 6
         #wires = get_input("input03-test1") # 159
-        #wires = get_input("input03-test2") # 135
+        wires = get_input("input03-test2") # 135
 
-    print("wires", wires)
+    #print("wires", wires)
 
 
-    centerpoint = (1,1);
-    # grid[x][y] # e-e
-    grid = []
+    centerpoint = (1,1)
+    wires_points = []
     crosses = []
-
-    grid.append(centerpoint)
 
 
     for wire in wires:
         # start at centerpoint
         print("WIRE")
         startpoint = centerpoint;
-
+        wire_points = []
 
         for drr in wire:
             endpoint = drr_to_point(startpoint, drr)
             #print("endpoint", endpoint)
-            draw_line(grid, startpoint, endpoint, crosses)
+            draw_line(wire_points, startpoint, endpoint)
             # end as new start
             startpoint = endpoint
 
-    #print("grid", grid)
-    #dump_grid(grid, 100, 100, crosses, centerpoint)
+        wires_points.append(wire_points)
 
-    print("crosses", crosses)
+
+    #print("wires_points", wires_points)
+
+
+    (wp1, wp2) = wires_points
+
+    crosses = [*set(wp1).intersection(wp2)]
+
+    #print("crosses", crosses)
+
+    print("size", get_grid_size_limit(wires_points))
 
     distances = [*map(lambda p: distance_manhattan(centerpoint, p), crosses)]
     print("distances", distances)

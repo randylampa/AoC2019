@@ -9,9 +9,14 @@ import os
 DIR = os.path.dirname(os.path.realpath(__file__))
 
 
+def data_to_program(data):
+    program = [*map(int, data.strip().split(","))]
+    return program
+
+
 def get_program(name):
     fh = open(DIR + "/" + name, "r")
-    program = [*map(int, fh.read().strip().split(","))]
+    program = data_to_program(fh.read())
     return program
 
 
@@ -25,6 +30,10 @@ def execute_intcode_program(memory, dbg = True):
     I_MUL = 2
     I_INP = 3
     I_OUT = 4
+    I_JNZ = 5 # jump if non-zero
+    I_JEZ = 6 # jump if equal zero
+    I_CLT = 7 # compare less than
+    I_CEQ = 8 # compare equal
     I_HLT = 99
 
     valid = True
@@ -32,6 +41,12 @@ def execute_intcode_program(memory, dbg = True):
     pc = 0
     pc_step = 1
     while pc < len(memory):
+
+        op1_val = None
+        op2_val = None
+        res_addr = None
+        res_val = None
+        jmp_val = None
 
         # FETCH
         instr = memory[pc]
@@ -43,19 +58,13 @@ def execute_intcode_program(memory, dbg = True):
         print("PC={}, OP={}, MODE={}".format(pc, opcode, modes))
 
         # DECODE
-
-        op1_val = None
-        op2_val = None
-        res_addr = None
-        res_val = None
-
         if opcode in [I_HLT]:
             pc_step = 1
         elif opcode in [I_INP, I_OUT]:
             pc_step = 2
-        elif opcode in []:
+        elif opcode in [I_JNZ, I_JEZ]:
             pc_step = 3
-        elif opcode in [I_ADD, I_MUL]:
+        elif opcode in [I_ADD, I_MUL, I_CLT, I_CEQ]:
             pc_step = 4
         else:
             raise IntcodeError("UNKNOWN instruction={} on pc={}".format(instr, pc))
@@ -64,7 +73,10 @@ def execute_intcode_program(memory, dbg = True):
             res_addr = memory[pc + 1]
         elif opcode in [I_OUT]:
             op1_val = memory[pc + 1] if modes[0] == 1 else memory[memory[pc + 1]]
-        elif opcode in [I_ADD, I_MUL]:
+        elif opcode in [I_JNZ, I_JEZ]:
+            op1_val = memory[pc + 1] if modes[0] == 1 else memory[memory[pc + 1]]
+            op2_val = memory[pc + 2] if modes[1] == 1 else memory[memory[pc + 2]]
+        elif opcode in [I_ADD, I_MUL, I_CLT, I_CEQ]:
             op1_val = memory[pc + 1] if modes[0] == 1 else memory[memory[pc + 1]]
             op2_val = memory[pc + 2] if modes[1] == 1 else memory[memory[pc + 2]]
             res_addr = memory[pc + 3]
@@ -84,6 +96,18 @@ def execute_intcode_program(memory, dbg = True):
                 res_val = 0
         elif opcode == I_OUT:
             print("Intcode OUTPUT :$", op1_val)
+        elif opcode == I_JNZ:
+            if op1_val != 0:
+                jmp_val = op2_val
+        elif opcode == I_JEZ:
+            if op1_val == 0:
+                jmp_val = op2_val
+        elif opcode == I_CLT:
+            res_val = 1 if op1_val < op2_val else 0
+        elif opcode == I_CEQ:
+            res_val = 1 if op1_val == op2_val else 0
+        else:
+            raise IntcodeError("NOT IMPLEMENTED instruction={} on pc={}".format(instr, pc))
 
         # WRITEBACK
         if res_addr is not None:
@@ -91,7 +115,10 @@ def execute_intcode_program(memory, dbg = True):
 
         #print(memory)
 
-        pc += pc_step
+        if jmp_val:
+            pc = jmp_val
+        else:
+            pc += pc_step
 
     return valid
 
@@ -103,9 +130,9 @@ def solve1():
         memimg = get_program("input05")
     else:
         # input test
-        memimg = get_program("input05-test1")
-        #memimg = get_program("input05-test2")
-        #memimg = get_program("input05-test3")
+        memimg = get_program("input05.1-test1")
+        #memimg = get_program("input05.1-test2")
+        #memimg = get_program("input05.1-test3")
         #memimg = [102, 3, 1, 0, 99] # [9, 3, 1, 0, 99]
 
     print("program-pre", memimg)
@@ -119,15 +146,31 @@ def solve1():
 
 
 def solve2():
+
+    if True:
+        # input
+        memimg = get_program("input05")
+    else:
+        # input test
+        memimg = get_program("input05.2-test1")
+        #memimg = data_to_program("")
+
+    print("program-pre", memimg)
+
+
+    execute_intcode_program(memimg)
+
+    print("program-post", memimg)
+
     pass
 
 
 if __name__ == "__main__":
 
     print("="*40)
-    print("Solve 1 status:", solve1())
+    #print("Solve 1 status:", solve1())
     print("="*40)
 
     print("="*40)
-    #print("Solve 2 status:", solve2())
+    print("Solve 2 status:", solve2())
     print("="*40)

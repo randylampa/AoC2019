@@ -9,7 +9,17 @@ import os
 DIR = os.path.dirname(os.path.realpath(__file__))
 
 
+def get_file(name, filter_cbk = str):
+    fh = open(DIR + "/" + name, "r")
+    program = filter_cbk(fh.read())
+    return program
+
+
 def solve1():
+
+    data = get_file(__file__, lambda x: "".join(filter(lambda y: y not in [" ", "\n"], x)))
+    print(data)
+
     pass
 
 

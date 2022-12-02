@@ -54,6 +54,10 @@ def generate_all_orbits(orbit_list, center, orbit_chain = []):
         generate_all_orbits(orbit_list, orbiter, orbit_chain2)
 
 
+def orbital_transfer(orbit_list, orbit_from, orbit_to):
+    pass
+    return
+
 def solve1():
 
     orbits = get_file("input06", data_to_orbits)
@@ -90,15 +94,38 @@ def solve1():
 
 
 def solve2():
+
+    #orbits = get_file("input06", data_to_orbits)
+    orbits = get_file("input06.2-test", data_to_orbits)
+    print(orbits)
+
+    orbit_list = [
+        [], # indexes
+        [], # orbiters
+        [], # chains
+    ]
+
+    for orbit in orbits:
+        put_orbit(orbit_list, orbit)
+
+    generate_all_orbits(orbit_list, "COM")
+
+    print("orbit_list", orbit_list)
+
+
+    ot = orbital_transfer(orbit_list, "YOU", "SAN")
+
+    print("ot", ot)
+
     pass
 
 
 if __name__ == "__main__":
 
     print("="*40)
-    print("Solve 1 status:", solve1())
+    #print("Solve 1 status:", solve1())
     print("="*40)
 
     print("="*40)
-    #print("Solve 2 status:", solve2())
+    print("Solve 2 status:", solve2())
     print("="*40)
